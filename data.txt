@@ -99,6 +99,7 @@
   ],
   "allAds": [],
   "adRequests": [],
+  "adminBankAccountNumber": "database error",
   "allCategories": [
     {
       "id": "008534005fd94ad78d86024817e0f3c1",

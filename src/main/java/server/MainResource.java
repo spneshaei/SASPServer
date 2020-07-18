@@ -21,6 +21,8 @@ public class MainResource extends ServerResource {
         DataManager.loadData();
         if (!DataManager.shared().isMadeAdminBankAccount()) {
             BankAPI.tellBankAndReceiveResponse("create_account Admin Admin admin admin admin", response -> {
+                DataManager.shared().setAdminBankAccountNumber(response);
+                DataManager.saveData();
             });
         }
         String action = getQuery().getValues("action");
@@ -116,6 +118,8 @@ public class MainResource extends ServerResource {
                 return syncSellLogs();
             case "syncTemporaryCart":
                 return syncTemporaryCart();
+            case "getAdminBankAccountNumber":
+                return getAdminBankAccountNumber();
             default:
                 return new StringRepresentation("wrong-action");
         }
@@ -285,7 +289,9 @@ public class MainResource extends ServerResource {
             }
             DataManager.shared().registerAccount(account);
             if (!type.equals("administrator")) {
+                Account finalAccount = account;
                 BankAPI.tellBankAndReceiveResponse("create_account " + firstName + " " + lastName + " " + username + " " + password + " " + password, response -> {
+                    if (finalAccount != null) finalAccount.setBankAccountNumber(response);
                 });
             }
             resultStr = "success";
@@ -469,5 +475,9 @@ public class MainResource extends ServerResource {
         String categoryID = getQuery().getValues("id");
         DataManager.shared().removeCategory(categoryID);
         return new StringRepresentation("success");
+    }
+
+    private Representation getAdminBankAccountNumber() {
+        return new StringRepresentation(DataManager.shared().getAdminBankAccountNumber());
     }
 }

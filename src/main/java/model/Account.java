@@ -14,6 +14,15 @@ public class Account {
     private ArrayList<String> coupons;
     private ArrayList<String> logs;
     private int credit;
+    private String bankAccountNumber = "";
+
+    public String getBankAccountNumber() {
+        return bankAccountNumber;
+    }
+
+    public void setBankAccountNumber(String bankAccountNumber) {
+        this.bankAccountNumber = bankAccountNumber;
+    }
 
     public String getProfilePicPath() {
         return profilePicPath;

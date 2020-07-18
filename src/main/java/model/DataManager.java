@@ -37,14 +37,18 @@ public class DataManager {
     private ArrayList<SellerRegistrationRequest> sellerRegistrationRequests = new ArrayList<>();
     private ArrayList<Ad> allAds = new ArrayList<>();
     private ArrayList<AddAdBySellerRequest> adRequests = new ArrayList<>();
-    private boolean madeAdminBankAccount = false;
+    private String adminBankAccountNumber = "";
 
     public boolean isMadeAdminBankAccount() {
-        return madeAdminBankAccount;
+        return !adminBankAccountNumber.equals("");
     }
 
-    public void setMadeAdminBankAccount(boolean madeAdminBankAccount) {
-        this.madeAdminBankAccount = madeAdminBankAccount;
+    public String getAdminBankAccountNumber() {
+        return adminBankAccountNumber;
+    }
+
+    public void setAdminBankAccountNumber(String adminBankAccountNumber) {
+        this.adminBankAccountNumber = adminBankAccountNumber;
     }
 
     private ArrayList<Category> allCategories = new ArrayList<>();
