@@ -11,6 +11,8 @@ import org.restlet.resource.ServerResource;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 // TODO: IMPORTANT: KARMOZD!!
@@ -27,101 +29,108 @@ public class MainResource extends ServerResource {
         }
         String action = getQuery().getValues("action");
         if (action == null) return new StringRepresentation("wrong-action");
-        switch (action) {
-            case "register":
-                return register();
-            case "login":
-                return login();
-            case "getAllAds":
-                return getAllAds();
-            case "getAllPurchaseLogs":
-                return getAllPurchaseLogs();
-            case "getAllSellLogs":
-                return getAllSellLogs();
-            case "logout":
-                return logout();
-            case "addAd":
-                return addAd();
-            case "getTemporaryCart":
-                return getTemporaryCart();
-            case "setTemporaryCart":
-                return setTemporaryCart();
-            case "getAllSales":
-                return getAllSales();
-            case "getAllCustomers":
-                return getAllCustomers();
-            case "getAllSellers":
-                return getAllSellers();
-            case "getAllAdministrators":
-                return getAllAdministrators();
-            case "getAllCategories":
-                return getAllCategories();
-            case "getAddProductBySellerRequests":
-                return getAddProductBySellerRequests();
-            case "getAddSaleBySellerRequests":
-                return getAddSaleBySellerRequests();
-            case "getEditProductBySellerRequests":
-                return getEditProductBySellerRequests();
-            case "getEditSaleBySellerRequests":
-                return getEditSaleBySellerRequests();
-            case "getSellerRegistrationRequests":
-                return getSellerRegistrationRequests();
-            case "getAdRequests":
-                return getAdRequests();
-            case "addRequest":
-                return addRequest();
-            case "getAllCoupons":
-                return getAllCoupons();
-            case "getAllProducts":
-                return getAllProducts();
-            case "removeProduct":
-                return removeProduct();
-            case "addLog":
-                return addLog();
-            case "addSale":
-                return addSale();
-            case "addProduct":
-                return addProduct();
-            case "addCoupon":
-                return addCoupon();
-            case "addCategory":
-                return addCategory();
-            case "removeCoupon":
-                return removeCoupon();
-            case "removeRequest":
-                return removeRequest();
-            case "removeSale":
-                return removeSale();
-            case "removeAccount":
-                return removeAccount();
-            case "removeCategory":
-                return removeCategory();
-            case "syncProducts":
-                return syncProducts();
-            case "syncCustomers":
-                return syncCustomers();
-            case "syncSellers":
-                return syncSellers();
-            case "syncAdministrators":
-                return syncAdministrators();
-            case "syncCategories":
-                return syncCategories();
-            case "syncSales":
-                return syncSales();
-            case "syncCoupons":
-                return syncCoupons();
-            case "syncCartForUser":
-                return syncCartForUser();
-            case "syncPurchaseLogs":
-                return syncPurchaseLogs();
-            case "syncSellLogs":
-                return syncSellLogs();
-            case "syncTemporaryCart":
-                return syncTemporaryCart();
-            case "getAdminBankAccountNumber":
-                return getAdminBankAccountNumber();
-            default:
-                return new StringRepresentation("wrong-action");
+        try {
+            switch (action) {
+                case "register":
+                    return register();
+                case "login":
+                    return login();
+                case "getAllAds":
+                    return getAllAds();
+                case "getAllPurchaseLogs":
+                    return getAllPurchaseLogs();
+                case "getAllSellLogs":
+                    return getAllSellLogs();
+                case "logout":
+                    return logout();
+                case "addAd":
+                    return addAd();
+                case "getTemporaryCart":
+                    return getTemporaryCart();
+                case "setTemporaryCart":
+                    return setTemporaryCart();
+                case "getAllSales":
+                    return getAllSales();
+                case "getAllCustomers":
+                    return getAllCustomers();
+                case "getAllSellers":
+                    return getAllSellers();
+                case "getAllAdministrators":
+                    return getAllAdministrators();
+                case "getAllCategories":
+                    return getAllCategories();
+                case "getAddProductBySellerRequests":
+                    return getAddProductBySellerRequests();
+                case "getAddSaleBySellerRequests":
+                    return getAddSaleBySellerRequests();
+                case "getEditProductBySellerRequests":
+                    return getEditProductBySellerRequests();
+                case "getEditSaleBySellerRequests":
+                    return getEditSaleBySellerRequests();
+                case "getSellerRegistrationRequests":
+                    return getSellerRegistrationRequests();
+                case "getAdRequests":
+                    return getAdRequests();
+                case "addRequest":
+                    return addRequest();
+                case "getAllCoupons":
+                    return getAllCoupons();
+                case "getAllProducts":
+                    return getAllProducts();
+                case "removeProduct":
+                    return removeProduct();
+                case "addLog":
+                    return addLog();
+                case "addSale":
+                    return addSale();
+                case "addProduct":
+                    return addProduct();
+                case "addCoupon":
+                    return addCoupon();
+                case "addCategory":
+                    return addCategory();
+                case "removeCoupon":
+                    return removeCoupon();
+                case "removeRequest":
+                    return removeRequest();
+                case "removeSale":
+                    return removeSale();
+                case "removeAccount":
+                    return removeAccount();
+                case "removeCategory":
+                    return removeCategory();
+                case "syncProducts":
+                    return syncProducts();
+                case "syncCustomers":
+                    return syncCustomers();
+                case "syncSellers":
+                    return syncSellers();
+                case "syncAdministrators":
+                    return syncAdministrators();
+                case "syncCategories":
+                    return syncCategories();
+                case "syncSales":
+                    return syncSales();
+                case "syncCoupons":
+                    return syncCoupons();
+                case "syncCartForUser":
+                    return syncCartForUser();
+                case "syncPurchaseLogs":
+                    return syncPurchaseLogs();
+                case "syncSellLogs":
+                    return syncSellLogs();
+                case "syncTemporaryCart":
+                    return syncTemporaryCart();
+                case "getAdminBankAccountNumber":
+                    return getAdminBankAccountNumber();
+                case "getOnlineUsernames":
+                    return getOnlineUsernames();
+                default:
+                    return new StringRepresentation("wrong-action");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new StringRepresentation("wrong-action");
         }
     }
 
@@ -185,6 +194,7 @@ public class MainResource extends ServerResource {
         String json = getQuery().getValues("cart");
         String token = getQuery().getValues("token");
         Cart cart = new Gson().fromJson(json, Cart.class);
+        if (token == null) return new StringRepresentation("wrong-token");
         Account account = DataManager.shared().getAccountWithToken(token);
         if (account == null) return new StringRepresentation("wrong-token");
         if (!(account instanceof Customer)) return new StringRepresentation("not-customer");
@@ -246,6 +256,8 @@ public class MainResource extends ServerResource {
         String username = getQuery().getValues("username");
         String password = getQuery().getValues("password");
         String resultStr = "wrong-details";
+        if (username == null || password == null || username.equals("") || password.equals(""))
+            return new StringRepresentation(resultStr);
 
         if (DataManager.shared().doesUserWithGivenUsernameExist(username)
                 && DataManager.shared().givenUsernameHasGivenPassword(username, password)) {
@@ -270,6 +282,13 @@ public class MainResource extends ServerResource {
         String companyDetails = getQuery().getValues("companyDetails");
 
         String resultStr = "wrong-details";
+
+        if (username == null || password == null || email == null || phoneNumber == null
+                || firstName == null || lastName == null || type == null
+                || username.equals("") || password.equals("") || email.equals("")
+                || phoneNumber.equals("") || firstName.equals("") || lastName.equals("") || type.equals("")
+                || (type.equals("seller") && (companyDetails == null || companyDetails.equals(""))))
+            return new StringRepresentation(resultStr);
 
         if (!DataManager.shared().doesUserWithGivenUsernameExist(username)) {
             // TODO: Profile Pic!!
@@ -317,19 +336,23 @@ public class MainResource extends ServerResource {
     }
 
     public Representation logout() {
-        DataManager.shared().logout(getQuery().getValues("token"));
+        String token = getQuery().getValues("token");
+        if (token == null || token.equals("")) return new StringRepresentation("wrong-action");
+        DataManager.shared().logout(token);
         return new StringRepresentation("success");
     }
 
     public Representation addAd() {
-        Ad ad = new Ad(getQuery().getValues("id"), getQuery().getValues("content"));
-        DataManager.shared().addAd(ad);
+        String id = getQuery().getValues("id");
+        String content = getQuery().getValues("content");
+        if (id == null || content == null || id.equals("") || content.equals(""))
+            return new StringRepresentation("wrong-action");
+        DataManager.shared().addAd(new Ad(id, content));
         return new StringRepresentation("success");
     }
 
     public Representation getTemporaryCart() {
         String s = new Gson().toJson(DataManager.shared().getTemporaryCart());
-        System.out.println("SSS= " + s);
         return new StringRepresentation(s);
     }
 
@@ -364,7 +387,7 @@ public class MainResource extends ServerResource {
     public Representation addRequest() {
         String requestJSON = getQuery().getValues("request");
         String requestType = getQuery().getValues("requestType");
-        Request request = null;
+        Request request;
         switch (requestType) {
             case "AddProductBySellerRequest":
                 request = new Gson().fromJson(requestJSON, AddProductBySellerRequest.class);
@@ -384,6 +407,8 @@ public class MainResource extends ServerResource {
             case "AddAdBySellerRequest":
                 request = new Gson().fromJson(requestJSON, AddAdBySellerRequest.class);
                 break;
+            default:
+                return new StringRepresentation("wrong-action");
         }
         DataManager.shared().addRequest(request);
         return new StringRepresentation("success");
@@ -399,6 +424,7 @@ public class MainResource extends ServerResource {
 
     public Representation removeProduct() {
         String productID = getQuery().getValues("id");
+        if (productID == null || productID.equals("")) return new StringRepresentation("wrong-action");
         DataManager.shared().removeProduct(productID);
         return new StringRepresentation("success");
     }
@@ -406,7 +432,7 @@ public class MainResource extends ServerResource {
     public Representation addLog() {
         String logJSON = getQuery().getValues("log");
         String logType = getQuery().getValues("logType");
-        Log log = null;
+        Log log;
         switch (logType) {
             case "SellLog":
                 log = new Gson().fromJson(logJSON, SellLog.class);
@@ -414,6 +440,8 @@ public class MainResource extends ServerResource {
             case "PurchaseLog":
                 log = new Gson().fromJson(logJSON, PurchaseLog.class);
                 break;
+            default:
+                return new StringRepresentation("wrong-action");
         }
         DataManager.shared().addLog(log);
         return new StringRepresentation("success");
@@ -449,35 +477,52 @@ public class MainResource extends ServerResource {
 
     public Representation removeCoupon() {
         String couponID = getQuery().getValues("id");
+        if (couponID == null || couponID.equals("")) return new StringRepresentation("wrong-action");
         DataManager.shared().removeCoupon(couponID);
         return new StringRepresentation("success");
     }
 
     public Representation removeRequest() {
         String requestID = getQuery().getValues("id");
+        if (requestID == null || requestID.equals("")) return new StringRepresentation("wrong-action");
         DataManager.shared().removeRequest(requestID);
         return new StringRepresentation("success");
     }
 
     public Representation removeSale() {
         String saleID = getQuery().getValues("id");
+        if (saleID == null || saleID.equals("")) return new StringRepresentation("wrong-action");
         DataManager.shared().removeSale(saleID);
         return new StringRepresentation("success");
     }
 
     public Representation removeAccount() {
         String username = getQuery().getValues("username");
+        if (username == null || username.equals("")) return new StringRepresentation("wrong-action");
         DataManager.shared().removeAccount(username);
         return new StringRepresentation("success");
     }
 
     public Representation removeCategory() {
         String categoryID = getQuery().getValues("id");
+        if (categoryID == null || categoryID.equals("")) return new StringRepresentation("wrong-action");
         DataManager.shared().removeCategory(categoryID);
         return new StringRepresentation("success");
     }
 
     private Representation getAdminBankAccountNumber() {
         return new StringRepresentation(DataManager.shared().getAdminBankAccountNumber());
+    }
+
+    private Representation getOnlineUsernames() {
+        ArrayList<String> usernames = new ArrayList<>();
+        Iterator it = DataManager.shared().getLoggedInAccountsAndTokens().entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            Account account = (Account) pair.getValue();
+            if (!usernames.contains(account.getUsername())) usernames.add(account.getUsername());
+            it.remove();
+        }
+        return new StringRepresentation(new Gson().toJson(usernames));
     }
 }

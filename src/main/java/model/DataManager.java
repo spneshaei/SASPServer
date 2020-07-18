@@ -43,6 +43,10 @@ public class DataManager {
         return !adminBankAccountNumber.equals("");
     }
 
+    public HashMap<String, Account> getLoggedInAccountsAndTokens() {
+        return loggedInAccountsAndTokens;
+    }
+
     public String getAdminBankAccountNumber() {
         return adminBankAccountNumber;
     }
