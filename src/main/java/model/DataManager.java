@@ -18,6 +18,7 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
@@ -40,6 +41,23 @@ public class DataManager {
     private ArrayList<AddAdBySellerRequest> adRequests = new ArrayList<>();
     private ArrayList<Auction> auctions = new ArrayList<>();
     private String adminBankAccountNumber = "";
+
+    private transient ArrayList<IPRecord> ipRecords = new ArrayList<>();
+
+    public ArrayList<IPRecord> getIPRecords() {
+        return ipRecords;
+    }
+
+    // TODO: Does the next method work correctly??
+
+    public boolean hasMoreThanAThousandIPRecordsInASecond(IPRecord currentIPRecord) {
+        return (int) ipRecords.stream().filter(ipRecord -> ipRecord.getIp().equals(currentIPRecord.getIp()) &&
+                Math.abs(ChronoUnit.SECONDS.between(ipRecord.getDate(), currentIPRecord.getDate())) < 2).count() > 1000;
+    }
+
+    public void addIPRecord(IPRecord ipRecord) {
+        ipRecords.add(ipRecord);
+    }
 
     public boolean isMadeAdminBankAccount() {
         return !adminBankAccountNumber.equals("");
@@ -519,7 +537,7 @@ class LocalDateTimeSerializer implements JsonSerializer<LocalDateTime> {
     public JsonElement serialize(LocalDateTime localDateTime, Type srcType, JsonSerializationContext context) {
 //        if (localDateTime == null) return new JsonPrimitive("");
 //        try {
-            return new JsonPrimitive(formatter.format(localDateTime));
+        return new JsonPrimitive(formatter.format(localDateTime));
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }

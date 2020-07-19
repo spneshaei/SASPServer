@@ -8,14 +8,15 @@ import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
+import org.restlet.util.Series;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 // TODO: IMPORTANT: KARMOZD!!
+
+// TODO: DDoS Not Tested!
 
 public class MainResource extends ServerResource {
     @Get
@@ -27,6 +28,12 @@ public class MainResource extends ServerResource {
                 DataManager.saveData();
             });
         }
+        List<String> ipsList = org.restlet.Request.getCurrent().getClientInfo().getForwardedAddresses();
+        String ip = ipsList.get(ipsList.size() - 1);
+        IPRecord ipRecord = new IPRecord(ip, LocalDateTime.now());
+        DataManager.shared().addIPRecord(ipRecord);
+        if (DataManager.shared().hasMoreThanAThousandIPRecordsInASecond(ipRecord))
+            return new StringRepresentation("too-many-times");
         String action = getQuery().getValues("action");
         if (action == null) return new StringRepresentation("wrong-action");
         try {
