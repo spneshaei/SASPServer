@@ -1,14 +1,11 @@
 package server;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import model.*;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Get;
-import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
-import org.restlet.util.Series;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -28,9 +25,7 @@ public class MainResource extends ServerResource {
                 DataManager.saveData();
             });
         }
-        List<String> ipsList = org.restlet.Request.getCurrent().getClientInfo().getForwardedAddresses();
-        String ip = ipsList.get(ipsList.size() - 1);
-        IPRecord ipRecord = new IPRecord(ip, LocalDateTime.now());
+        IPRecord ipRecord = new IPRecord(getIP(), LocalDateTime.now());
         DataManager.shared().addIPRecord(ipRecord);
         if (DataManager.shared().hasMoreThanAThousandIPRecordsInASecond(ipRecord))
             return new StringRepresentation("too-many-times");
@@ -143,6 +138,11 @@ public class MainResource extends ServerResource {
             e.printStackTrace();
             return new StringRepresentation("wrong-action");
         }
+    }
+
+    private String getIP() {
+        List<String> ipsList = org.restlet.Request.getCurrent().getClientInfo().getForwardedAddresses();
+        return ipsList.get(ipsList.size() - 1);
     }
 
     private Representation syncProducts() {
@@ -273,13 +273,20 @@ public class MainResource extends ServerResource {
         return new StringRepresentation(new Gson().toJson(DataManager.shared().getAdRequests()));
     }
 
+    // TODO: Brute-Force is not tested...
+
     private Representation login() {
+        IPRecord ipRecord = new IPRecord(getIP(), LocalDateTime.now());
+        if (DataManager.shared().hasMoreThanTenUnsuccessfulLoginIPRecordsIn100Seconds(ipRecord))
+            return new StringRepresentation("too-many-times");
         String username = getQuery().getValues("username");
         String password = getQuery().getValues("password");
         String resultStr = "wrong-details";
         if (username == null || password == null || username.equals("") || password.equals("") ||
-                username.length() > 100 || password.length() > 100)
+                username.length() > 100 || password.length() > 100) {
+            DataManager.shared().addUnsuccessfulLoginIPRecord(ipRecord);
             return new StringRepresentation(resultStr);
+        }
 
         if (DataManager.shared().doesUserWithGivenUsernameExist(username)
                 && DataManager.shared().givenUsernameHasGivenPassword(username, password)) {

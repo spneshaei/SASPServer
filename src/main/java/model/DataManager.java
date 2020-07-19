@@ -9,7 +9,6 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import server.DBHandler;
 
 import java.io.*;
 import java.lang.reflect.Type;
@@ -43,10 +42,7 @@ public class DataManager {
     private String adminBankAccountNumber = "";
 
     private transient ArrayList<IPRecord> ipRecords = new ArrayList<>();
-
-    public ArrayList<IPRecord> getIPRecords() {
-        return ipRecords;
-    }
+    private transient ArrayList<IPRecord> unsuccessfulLoginIPRecords = new ArrayList<>();
 
     // TODO: Does the next method work correctly??
 
@@ -55,8 +51,17 @@ public class DataManager {
                 Math.abs(ChronoUnit.SECONDS.between(ipRecord.getDate(), currentIPRecord.getDate())) < 2).count() > 1000;
     }
 
+    public boolean hasMoreThanTenUnsuccessfulLoginIPRecordsIn100Seconds(IPRecord currentIPRecord) {
+        return (int) unsuccessfulLoginIPRecords.stream().filter(ipRecord -> ipRecord.getIp().equals(currentIPRecord.getIp()) &&
+                Math.abs(ChronoUnit.SECONDS.between(ipRecord.getDate(), currentIPRecord.getDate())) < 100).count() > 10;
+    }
+
     public void addIPRecord(IPRecord ipRecord) {
         ipRecords.add(ipRecord);
+    }
+
+    public void addUnsuccessfulLoginIPRecord(IPRecord ipRecord) {
+        unsuccessfulLoginIPRecords.add(ipRecord);
     }
 
     public boolean isMadeAdminBankAccount() {
