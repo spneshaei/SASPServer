@@ -194,7 +194,7 @@ public class MainResource extends ServerResource {
         String json = getQuery().getValues("cart");
         String token = getQuery().getValues("token");
         Cart cart = new Gson().fromJson(json, Cart.class);
-        if (token == null) return new StringRepresentation("wrong-token");
+        if (token == null || token.length() != 32) return new StringRepresentation("wrong-token");
         Account account = DataManager.shared().getAccountWithToken(token);
         if (account == null) return new StringRepresentation("wrong-token");
         if (!(account instanceof Customer)) return new StringRepresentation("not-customer");
@@ -256,7 +256,8 @@ public class MainResource extends ServerResource {
         String username = getQuery().getValues("username");
         String password = getQuery().getValues("password");
         String resultStr = "wrong-details";
-        if (username == null || password == null || username.equals("") || password.equals(""))
+        if (username == null || password == null || username.equals("") || password.equals("") ||
+                username.length() > 100 || password.length() > 100)
             return new StringRepresentation(resultStr);
 
         if (DataManager.shared().doesUserWithGivenUsernameExist(username)
@@ -287,7 +288,9 @@ public class MainResource extends ServerResource {
                 || firstName == null || lastName == null || type == null
                 || username.equals("") || password.equals("") || email.equals("")
                 || phoneNumber.equals("") || firstName.equals("") || lastName.equals("") || type.equals("")
-                || (type.equals("seller") && (companyDetails == null || companyDetails.equals(""))))
+                || (type.equals("seller") && (companyDetails == null || companyDetails.equals(""))) ||
+                username.length() > 100 || password.length() > 100 || email.length() > 100 ||
+                phoneNumber.length() > 50 || firstName.length() > 150 || lastName.length() > 150 || type.length() > 25)
             return new StringRepresentation(resultStr);
 
         if (!DataManager.shared().doesUserWithGivenUsernameExist(username)) {
@@ -337,7 +340,7 @@ public class MainResource extends ServerResource {
 
     public Representation logout() {
         String token = getQuery().getValues("token");
-        if (token == null || token.equals("")) return new StringRepresentation("wrong-action");
+        if (token == null || token.length() != 32) return new StringRepresentation("wrong-action");
         DataManager.shared().logout(token);
         return new StringRepresentation("success");
     }
@@ -345,7 +348,8 @@ public class MainResource extends ServerResource {
     public Representation addAd() {
         String id = getQuery().getValues("id");
         String content = getQuery().getValues("content");
-        if (id == null || content == null || id.equals("") || content.equals(""))
+        if (id == null || content == null || id.equals("") || content.equals("")
+                || id.length() > 32 || content.length() > 500)
             return new StringRepresentation("wrong-action");
         DataManager.shared().addAd(new Ad(id, content));
         return new StringRepresentation("success");
@@ -424,7 +428,8 @@ public class MainResource extends ServerResource {
 
     public Representation removeProduct() {
         String productID = getQuery().getValues("id");
-        if (productID == null || productID.equals("")) return new StringRepresentation("wrong-action");
+        if (productID == null || productID.equals("") || productID.length() > 32)
+            return new StringRepresentation("wrong-action");
         DataManager.shared().removeProduct(productID);
         return new StringRepresentation("success");
     }
@@ -477,35 +482,40 @@ public class MainResource extends ServerResource {
 
     public Representation removeCoupon() {
         String couponID = getQuery().getValues("id");
-        if (couponID == null || couponID.equals("")) return new StringRepresentation("wrong-action");
+        if (couponID == null || couponID.equals("") || couponID.length() > 32)
+            return new StringRepresentation("wrong-action");
         DataManager.shared().removeCoupon(couponID);
         return new StringRepresentation("success");
     }
 
     public Representation removeRequest() {
         String requestID = getQuery().getValues("id");
-        if (requestID == null || requestID.equals("")) return new StringRepresentation("wrong-action");
+        if (requestID == null || requestID.equals("") || requestID.length() > 32)
+            return new StringRepresentation("wrong-action");
         DataManager.shared().removeRequest(requestID);
         return new StringRepresentation("success");
     }
 
     public Representation removeSale() {
         String saleID = getQuery().getValues("id");
-        if (saleID == null || saleID.equals("")) return new StringRepresentation("wrong-action");
+        if (saleID == null || saleID.equals("") || saleID.length() > 32)
+            return new StringRepresentation("wrong-action");
         DataManager.shared().removeSale(saleID);
         return new StringRepresentation("success");
     }
 
     public Representation removeAccount() {
         String username = getQuery().getValues("username");
-        if (username == null || username.equals("")) return new StringRepresentation("wrong-action");
+        if (username == null || username.equals("") || username.length() > 100)
+            return new StringRepresentation("wrong-action");
         DataManager.shared().removeAccount(username);
         return new StringRepresentation("success");
     }
 
     public Representation removeCategory() {
         String categoryID = getQuery().getValues("id");
-        if (categoryID == null || categoryID.equals("")) return new StringRepresentation("wrong-action");
+        if (categoryID == null || categoryID.equals("") || categoryID.length() > 32)
+            return new StringRepresentation("wrong-action");
         DataManager.shared().removeCategory(categoryID);
         return new StringRepresentation("success");
     }

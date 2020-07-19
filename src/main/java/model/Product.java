@@ -27,6 +27,34 @@ public class Product {
     private boolean isSelected = false;
     private HashMap<String, String> features;
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
+    }
+
+    public void setVisitCount(int visitCount) {
+        this.visitCount = visitCount;
+    }
+
+    public void setNumberAvailable(int numberAvailable) {
+        this.numberAvailable = numberAvailable;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public boolean isSelected() {
         return isSelected;
     }
@@ -82,6 +110,10 @@ public class Product {
         return DataManager.dateFromString(dateCreated);
     }
 
+    public String getDateCreatedAsString() {
+        return dateCreated;
+    }
+
     public Status getStatus() {
         return status;
     }
@@ -104,6 +136,18 @@ public class Product {
 
     public ArrayList<Seller> getSellers() {
         return sellers.stream().map(id -> (Seller) DataManager.shared().getAccountWithGivenUsername(id)).collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public ArrayList<String> getSellersAsStringArray() {
+        return sellers;
+    }
+
+    public int[] getSlides() {
+        return slides;
+    }
+
+    public void setSlides(int[] slides) {
+        this.slides = slides;
     }
 
     public int getDiscountPercent() {

@@ -120,6 +120,21 @@ public class Account {
         return logs.stream().map(id -> DataManager.shared().getLogWithId(id)).collect(Collectors.toCollection(ArrayList::new));
     }
 
+    public ArrayList<PurchaseLog> getPurchaseLogs() {
+        return logs.stream().map(id -> DataManager.shared().getLogWithId(id))
+                .filter(logWithId -> logWithId instanceof PurchaseLog)
+                .map(logWithId -> (PurchaseLog) logWithId)
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public ArrayList<SellLog> getSellLogs() {
+        return logs.stream().map(id -> DataManager.shared().getLogWithId(id))
+                .filter(logWithId -> logWithId instanceof SellLog)
+                .map(logWithId -> (SellLog) logWithId)
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+
     public void addCoupon(Coupon coupon) {
         coupons.add(coupon.getId());
         DataManager.saveData();

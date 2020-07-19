@@ -22,6 +22,18 @@ public class Log {
         return DataManager.dateFromString(date);
     }
 
+    public void setPrice(long price) {
+        this.price = price;
+    }
+
+    public void setDiscountAmount(int discountAmount) {
+        this.discountAmount = discountAmount;
+    }
+
+    public String getDateAsString() {
+        return date;
+    }
+
     public long getPrice() {
         return price;
     }

@@ -9,6 +9,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import server.DBHandler;
 
 import java.io.*;
 import java.lang.reflect.Type;
@@ -126,6 +127,10 @@ public class DataManager {
         } catch (IOException e) {
             System.out.println("Unexpected exception happened in saving data: " + e.getLocalizedMessage());
         }
+
+//        DBHandler.insertProductsIntoTable();
+//        DBHandler.insertPurchaseLogsIntoTable();
+//        DBHandler.insertUsersIntoTable();
     }
 
     public static void loadData() {
@@ -145,6 +150,10 @@ public class DataManager {
         } catch (IOException e) {
             System.out.println("Unexpected exception happened in loading data: " + e.getLocalizedMessage());
         }
+
+//        DBHandler.selectProductsFromTable();
+//        DBHandler.selectUsersFromTable();
+//        DBHandler.selectPurchaseLogsFromTable();
     }
 
     public ArrayList<Ad> getAllAds() {
@@ -156,6 +165,10 @@ public class DataManager {
         result.addAll(purchaseLogs);
         result.addAll(sellLogs);
         return result;
+    }
+
+    public ArrayList<PurchaseLog> getPurchaseLogs() {
+        return purchaseLogs;
     }
 
     public void logout(String token) {
@@ -303,6 +316,13 @@ public class DataManager {
     public Account getAccountWithGivenUsername(String username) {
         for (Account account : getAllAccounts()) {
             if (account.getUsername().equals(username)) return account;
+        }
+        return null;
+    }
+
+    public PurchaseLog getPurchaseLogWithID(String id) {
+        for (PurchaseLog log : purchaseLogs) {
+            if (log.getId().equals(id)) return log;
         }
         return null;
     }
