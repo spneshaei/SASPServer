@@ -38,10 +38,19 @@ public class DataManager {
     private ArrayList<SellerRegistrationRequest> sellerRegistrationRequests = new ArrayList<>();
     private ArrayList<Ad> allAds = new ArrayList<>();
     private ArrayList<AddAdBySellerRequest> adRequests = new ArrayList<>();
+    private ArrayList<Auction> auctions = new ArrayList<>();
     private String adminBankAccountNumber = "";
 
     public boolean isMadeAdminBankAccount() {
         return !adminBankAccountNumber.equals("");
+    }
+
+    public ArrayList<Auction> getAuctions() {
+        return auctions;
+    }
+
+    public Auction getAuctionWithId(String id) {
+        return auctions.stream().filter(auction -> auction.getId().equals(id)).findFirst().orElse(null);
     }
 
     public HashMap<String, Account> getLoggedInAccountsAndTokens() {
@@ -109,6 +118,10 @@ public class DataManager {
         return sharedInstance;
     }
 
+    public void setAuctions(ArrayList<Auction> auctions) {
+        this.auctions = auctions;
+    }
+
     public static void saveData() {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(LocalDate.class, new LocalDateSerializer());
@@ -149,6 +162,7 @@ public class DataManager {
             sharedInstance = gson.fromJson(json, DataManager.class);
         } catch (IOException e) {
             System.out.println("Unexpected exception happened in loading data: " + e.getLocalizedMessage());
+            e.printStackTrace();
         }
 
 //        DBHandler.selectProductsFromTable();

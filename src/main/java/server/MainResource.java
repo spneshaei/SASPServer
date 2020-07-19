@@ -101,6 +101,8 @@ public class MainResource extends ServerResource {
                     return removeCategory();
                 case "syncProducts":
                     return syncProducts();
+                case "syncAuctions":
+                    return syncAuctions();
                 case "syncCustomers":
                     return syncCustomers();
                 case "syncSellers":
@@ -125,6 +127,8 @@ public class MainResource extends ServerResource {
                     return getAdminBankAccountNumber();
                 case "getOnlineUsernames":
                     return getOnlineUsernames();
+                case "getMessagesForAuction":
+                    return getMessagesForAuction();
                 default:
                     return new StringRepresentation("wrong-action");
             }
@@ -138,6 +142,16 @@ public class MainResource extends ServerResource {
         String productsJSON = getQuery().getValues("products");
         Product[] products = new Gson().fromJson(productsJSON, Product[].class);
         DataManager.shared().setAllProducts(new ArrayList<>(Arrays.asList(products)));
+        DataManager.saveData();
+        return new StringRepresentation("success");
+    }
+
+    // TODO: Auctions not tested
+
+    private Representation syncAuctions() {
+        String auctionsJSON = getQuery().getValues("auctions");
+        Auction[] auctions = new Gson().fromJson(auctionsJSON, Auction[].class);
+        DataManager.shared().setAuctions(new ArrayList<>(Arrays.asList(auctions)));
         DataManager.saveData();
         return new StringRepresentation("success");
     }
@@ -534,5 +548,13 @@ public class MainResource extends ServerResource {
             it.remove();
         }
         return new StringRepresentation(new Gson().toJson(usernames));
+    }
+
+    private Representation getMessagesForAuction() {
+        String auctionID = getQuery().getValues("auctionID");
+        if (auctionID == null || auctionID.length() > 32) return new StringRepresentation("wrong-action");
+        Auction auction = DataManager.shared().getAuctionWithId(auctionID);
+        if (auction == null) return new StringRepresentation("wrong-action");
+        return new StringRepresentation(new Gson().toJson(auction.getMessages()));
     }
 }
