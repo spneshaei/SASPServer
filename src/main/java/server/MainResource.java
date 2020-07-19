@@ -20,7 +20,7 @@ public class MainResource extends ServerResource {
     public Representation getAction() {
         DataManager.loadData();
         if (!DataManager.shared().isMadeAdminBankAccount()) {
-            BankAPI.tellBankAndReceiveResponse("create_account Admin Admin admin admin admin", response -> {
+            BankAPI.tellBankAndReceiveResponse("create_account Admin Admin admin kBfo#ou@yeq2 kBfo#ou@yeq2", response -> {
                 DataManager.shared().setAdminBankAccountNumber(response);
                 DataManager.saveData();
             });
@@ -320,7 +320,7 @@ public class MainResource extends ServerResource {
                 username.length() > 100 || password.length() > 100 || email.length() > 100 ||
                 phoneNumber.length() > 50 || firstName.length() > 150 || lastName.length() > 150 || type.length() > 25)
             return new StringRepresentation(resultStr);
-
+        if (!isPasswordStrong(password)) return new StringRepresentation("weak-password");
         if (!DataManager.shared().doesUserWithGivenUsernameExist(username)) {
             // TODO: Profile Pic!!
             Account account = null;
@@ -570,5 +570,34 @@ public class MainResource extends ServerResource {
         Auction auction = DataManager.shared().getAuctionWithId(auctionID);
         if (auction == null) return new StringRepresentation("wrong-action");
         return new StringRepresentation(new Gson().toJson(auction.getMessages()));
+    }
+
+    // TODO: Better password strength alg... both in server and client!
+
+//    private boolean isPasswordStrong(String password) {
+//        return true;
+//    }
+
+    private boolean isPasswordStrong(String password) {
+        if (DataManager.commonPasswords.contains(password)) return false;
+        if (password.length() < 8) return false;
+        int charCount = 0, numCount = 0;
+        for (int i = 0; i < password.length(); i++) {
+            char ch = password.charAt(i);
+            if (isNumeric(ch)) numCount++;
+            else if (isLetter(ch)) charCount++;
+            else return false;
+        }
+        return (charCount >= 2 && numCount >= 2);
+    }
+
+    private boolean isLetter(char ch) {
+        ch = Character.toUpperCase(ch);
+        return (ch >= 'A' && ch <= 'Z');
+    }
+
+
+    private boolean isNumeric(char ch) {
+        return (ch >= '0' && ch <= '9');
     }
 }

@@ -18,10 +18,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.UUID;
+import java.util.*;
 
 public class DataManager {
     private static DataManager sharedInstance;
@@ -43,6 +40,7 @@ public class DataManager {
 
     private transient ArrayList<IPRecord> ipRecords = new ArrayList<>();
     private transient ArrayList<IPRecord> unsuccessfulLoginIPRecords = new ArrayList<>();
+    public static transient ArrayList<String> commonPasswords = new ArrayList<>();
 
     // TODO: Does the next method work correctly??
 
@@ -169,8 +167,15 @@ public class DataManager {
 //        DBHandler.insertUsersIntoTable();
     }
 
+    // TODO: Not tested + what will happen in the client if we pass a common password??
+
     public static void loadData() {
         try {
+            if (commonPasswords.isEmpty()) {
+                Scanner sc = new Scanner(new FileInputStream("commonpasswords.txt"));
+                while (sc.hasNextLine()) commonPasswords.add(sc.nextLine());
+                sc.close();
+            }
             String json = new String(Files.readAllBytes(Paths.get("data.txt")));
             GsonBuilder gsonBuilder = new GsonBuilder();
             gsonBuilder.registerTypeAdapter(LocalDate.class, new LocalDateSerializer());
