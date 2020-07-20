@@ -48,14 +48,11 @@ public class Account {
         return credit;
     }
 
-    public void increaseCredit(int amount) {
-        credit += amount;
-        DataManager.saveData();
-    }
-
     public void decreaseCredit(int amount) {
-        credit -= amount;
-        DataManager.saveData();
+        if (credit - amount >= DataManager.shared().getMimimumCredit()) {
+            credit -= amount;
+            DataManager.saveData();
+        }
     }
 
     public void setCredit(int credit) {

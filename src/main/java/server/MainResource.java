@@ -7,6 +7,7 @@ import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -27,8 +28,8 @@ public class MainResource extends ServerResource {
         }
         IPRecord ipRecord = new IPRecord(getIP(), LocalDateTime.now());
         DataManager.shared().addIPRecord(ipRecord);
-        if (DataManager.shared().hasMoreThanAThousandIPRecordsInASecond(ipRecord))
-            return new StringRepresentation("too-many-times");
+//        if (DataManager.shared().hasMoreThanAThousandIPRecordsInASecond(ipRecord))
+//            return new StringRepresentation("too-many-times");
         String action = getQuery().getValues("action");
         if (action == null) return new StringRepresentation("wrong-action");
         try {
@@ -131,6 +132,10 @@ public class MainResource extends ServerResource {
                     return getOnlineUsernames();
                 case "getMessagesForAuction":
                     return getMessagesForAuction();
+                case "getMinimumCredit":
+                    return getMinimumCredit();
+                case "setMinimumCredit":
+                    return setMinimumCredit();
                 default:
                     return new StringRepresentation("wrong-action");
             }
@@ -141,8 +146,27 @@ public class MainResource extends ServerResource {
     }
 
     private String getIP() {
-        List<String> ipsList = org.restlet.Request.getCurrent().getClientInfo().getForwardedAddresses();
-        return ipsList.get(ipsList.size() - 1);
+        return "";
+//        org.restlet.Request restletRequest = getRequest();
+//        HttpServletRequest r = restletRequest.getHtt
+
+//        Map<String, String> map = getRequestHeadersInMap(ServletUtils.getRequest(restletRequest))
+//        List<String> ipsList = org.restlet.Request.getCurrent().getClientInfo().getForwardedAddresses();
+////        return ipsList.get(ipsList.size() - 1);
+//        return getRequest().get
+    }
+
+    private Map<String, String> getRequestHeadersInMap(HttpServletRequest request) {
+        Map<String, String> result = new HashMap<>();
+
+        Enumeration headerNames = request.getHeaderNames();
+        while (headerNames.hasMoreElements()) {
+            String key = (String) headerNames.nextElement();
+            String value = request.getHeader(key);
+            result.put(key, value);
+        }
+
+        return result;
     }
 
     private Representation syncProducts() {
@@ -277,8 +301,8 @@ public class MainResource extends ServerResource {
 
     private Representation login() {
         IPRecord ipRecord = new IPRecord(getIP(), LocalDateTime.now());
-        if (DataManager.shared().hasMoreThanTenUnsuccessfulLoginIPRecordsIn100Seconds(ipRecord))
-            return new StringRepresentation("too-many-times");
+//        if (DataManager.shared().hasMoreThanTenUnsuccessfulLoginIPRecordsIn100Seconds(ipRecord))
+//            return new StringRepresentation("too-many-times");
         String username = getQuery().getValues("username");
         String password = getQuery().getValues("password");
         String resultStr = "wrong-details";
@@ -337,10 +361,12 @@ public class MainResource extends ServerResource {
                     account = new Administrator(username, password, email, phoneNumber, firstName, lastName, "");
                     break;
             }
+            if (account != null) account.setCredit(DataManager.shared().getMimimumCredit());
             DataManager.shared().registerAccount(account);
             if (!type.equals("administrator")) {
                 Account finalAccount = account;
-                BankAPI.tellBankAndReceiveResponse("create_account " + firstName + " " + lastName + " " + username + " " + password + " " + password, response -> {
+                BankAPI.tellBankAndReceiveResponse("create_account " + firstName + " " +
+                        lastName + " " + username + " " + password + " " + password, response -> {
                     if (finalAccount != null) finalAccount.setBankAccountNumber(response);
                 });
             }
@@ -570,6 +596,22 @@ public class MainResource extends ServerResource {
         Auction auction = DataManager.shared().getAuctionWithId(auctionID);
         if (auction == null) return new StringRepresentation("wrong-action");
         return new StringRepresentation(new Gson().toJson(auction.getMessages()));
+    }
+
+    private Representation getMinimumCredit() {
+        return new StringRepresentation(String.valueOf(DataManager.shared().getMimimumCredit()));
+    }
+
+    private Representation setMinimumCredit() {
+        String creditStr = getQuery().getValues("credit");
+        if (creditStr == null || creditStr.length() > 100) return new StringRepresentation("wrong-action");
+        try {
+            DataManager.shared().setMimimumCredit(Integer.parseInt(creditStr));
+            return new StringRepresentation("success");
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return new StringRepresentation("wrong-action");
+        }
     }
 
     // TODO: Better password strength alg... both in server and client!

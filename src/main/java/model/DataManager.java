@@ -37,10 +37,20 @@ public class DataManager {
     private ArrayList<AddAdBySellerRequest> adRequests = new ArrayList<>();
     private ArrayList<Auction> auctions = new ArrayList<>();
     private String adminBankAccountNumber = "";
+    private int mimimumCredit = 0;
 
     private transient ArrayList<IPRecord> ipRecords = new ArrayList<>();
     private transient ArrayList<IPRecord> unsuccessfulLoginIPRecords = new ArrayList<>();
     public static transient ArrayList<String> commonPasswords = new ArrayList<>();
+
+    public int getMimimumCredit() {
+        return mimimumCredit;
+    }
+
+    public void setMimimumCredit(int mimimumCredit) {
+        this.mimimumCredit = mimimumCredit;
+        DataManager.saveData();
+    }
 
     // TODO: Does the next method work correctly??
 
