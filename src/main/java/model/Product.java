@@ -18,7 +18,8 @@ public class Product {
     private int numberAvailable;
     private String category;
     private String description;
-    private String imageURL;
+//    private String imageURL;
+    private String imageBase64;
     private int[] slides;
     private ArrayList<Comment> comments;
     private ArrayList<Score> scores;
@@ -71,12 +72,21 @@ public class Product {
         this.features = features;
     }
 
-    public String getImageURL() {
-        return imageURL;
+//    public String getImageURL() {
+//        return imageURL;
+//    }
+
+//    public void setImageURL(String imageURL) {
+//        this.imageURL = imageURL;
+//    }
+
+
+    public String getImageBase64() {
+        return imageBase64;
     }
 
-    public void setImageURL(String imageURL) {
-        this.imageURL = imageURL;
+    public void setImageBase64(String imageBase64) {
+        this.imageBase64 = imageBase64;
     }
 
     public Product(String productId, Status status, String name, String brand, int price, int discountPercent, ArrayList<Seller> sellers, int numberAvailable, Category category, String description, LocalDateTime dateCreated, HashMap<String, String> features) {

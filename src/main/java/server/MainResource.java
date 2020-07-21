@@ -2,6 +2,7 @@ package server;
 
 import com.google.gson.Gson;
 import model.*;
+import org.restlet.data.ClientInfo;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Get;
@@ -160,7 +161,9 @@ public class MainResource extends ServerResource {
     }
 
     private String getIP() {
-        return "";
+        org.restlet.Request restletRequest = getRequest();
+        ClientInfo c = restletRequest.getClientInfo();
+        return c.getAddress();
 //        org.restlet.Request restletRequest = getRequest();
 //        HttpServletRequest r = restletRequest.getHtt
 

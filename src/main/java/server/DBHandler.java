@@ -135,7 +135,8 @@ public class DBHandler {
                 ps.setInt(9, product.getNumberAvailable());
                 ps.setString(10, product.getCategory().getId());
                 ps.setString(11, product.getDescription());
-                ps.setString(12, product.getImageURL());
+//                ps.setString(12, product.getImageURL());
+                ps.setString(12, product.getImageBase64());
                 ps.setString(13, slides.toString());
                 ps.setString(14, comments.toString());
                 ps.setString(15, scores.toString());

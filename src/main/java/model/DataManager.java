@@ -83,11 +83,22 @@ public class DataManager {
     // TODO: Does the next method work correctly??
 
     public boolean hasMoreThanAThousandIPRecordsInASecond(IPRecord currentIPRecord) {
-        return (int) ipRecords.stream().filter(ipRecord -> ipRecord.getIp().equals(currentIPRecord.getIp()) &&
-                Math.abs(ChronoUnit.SECONDS.between(ipRecord.getDate(), currentIPRecord.getDate())) < 2).count() > 1000;
+        synchronized (ipRecords) {
+//            ArrayList<IPRecord> ipRecords = this.ipRecords;
+            long count = 0L;
+            for (Iterator<IPRecord> iterator = ipRecords.iterator(); iterator.hasNext(); ) {
+                IPRecord ipRecord = iterator.next();
+                if (ipRecord.getIp().equals(currentIPRecord.getIp()) &&
+                        Math.abs(ChronoUnit.SECONDS.between(ipRecord.getDate(), currentIPRecord.getDate())) < 2) {
+                    count += 1;
+                }
+            }
+            return (int) count > 1000;
+        }
     }
 
     public boolean hasMoreThanTenUnsuccessfulLoginIPRecordsIn100Seconds(IPRecord currentIPRecord) {
+        ArrayList<IPRecord> unsuccessfulLoginIPRecords = this.unsuccessfulLoginIPRecords;
         return (int) unsuccessfulLoginIPRecords.stream().filter(ipRecord -> ipRecord.getIp().equals(currentIPRecord.getIp()) &&
                 Math.abs(ChronoUnit.SECONDS.between(ipRecord.getDate(), currentIPRecord.getDate())) < 100).count() > 10;
     }
