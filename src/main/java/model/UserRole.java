@@ -1,7 +1,7 @@
 package model;
 
 public enum UserRole {
-    CUSTOMER, SELLER, ADMIN;
+    CUSTOMER, SELLER, ADMIN, ASSISTANT;
 
     @Override
     public String toString() {
@@ -12,6 +12,8 @@ public enum UserRole {
                 return "seller";
             case CUSTOMER:
                 return "customer";
+            case ASSISTANT:
+                return "assistant";
             default:
                 return "";
         }

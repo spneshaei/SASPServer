@@ -22,7 +22,7 @@ import java.util.*;
 
 public class DataManager {
     private static DataManager sharedInstance;
-    private HashMap<String, Account> loggedInAccountsAndTokens = new HashMap<>();
+    private HashMap<String, String> loggedInAccountsAndTokens = new HashMap<>();
     private ArrayList<Customer> allCustomers = new ArrayList<>();
     private ArrayList<Seller> allSellers = new ArrayList<>();
     private ArrayList<Administrator> allAdministrators = new ArrayList<>();
@@ -123,7 +123,7 @@ public class DataManager {
         return auctions.stream().filter(auction -> auction.getId().equals(id)).findFirst().orElse(null);
     }
 
-    public HashMap<String, Account> getLoggedInAccountsAndTokens() {
+    public HashMap<String, String> getLoggedInAccountsAndTokens() {
         return loggedInAccountsAndTokens;
     }
 
@@ -237,9 +237,9 @@ public class DataManager {
 
             Gson gson = gsonBuilder.setPrettyPrinting().create();
             sharedInstance = gson.fromJson(json, DataManager.class);
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.out.println("Unexpected exception happened in loading data: " + e.getLocalizedMessage());
-            e.printStackTrace();
+//            e.printStackTrace();
         }
 
 //        DBHandler.selectProductsFromTable();
@@ -384,7 +384,7 @@ public class DataManager {
     }
 
     public Account getAccountWithToken(String token) {
-        return loggedInAccountsAndTokens.get(token);
+        return DataManager.shared().getAccountWithGivenUsername(loggedInAccountsAndTokens.get(token));
     }
 
     public ArrayList<Coupon> getAllCoupons() {
@@ -423,10 +423,10 @@ public class DataManager {
         String token = DataManager.getNewId();
         for (Account account : getAllAccounts()) {
             if (account.getUsername().equals(username) && account.getPassword().equals(password)) {
-                loggedInAccountsAndTokens.put(token, account);
+                loggedInAccountsAndTokens.put(token, account.getUsername());
                 saveData();
-                if (account instanceof Customer || account instanceof Administrator || account instanceof Seller)
-                    return token;
+                if (account instanceof Customer || account instanceof Administrator ||
+                        account instanceof Seller || account instanceof Assistant) return token;
                 break;
             }
         }
@@ -487,6 +487,7 @@ public class DataManager {
     }
 
     public void addProduct(Product product) {
+        if (getProductWithId(product.getProductId()) != null) return;
         allProducts.add(product);
         saveData();
     }

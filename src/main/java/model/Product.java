@@ -1,5 +1,8 @@
 package model;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,7 +22,7 @@ public class Product {
     private String category;
     private String description;
 //    private String imageURL;
-    private String imageBase64;
+//    private String imageBase64;
     private int[] slides;
     private ArrayList<Comment> comments;
     private ArrayList<Score> scores;
@@ -82,11 +85,12 @@ public class Product {
 
 
     public String getImageBase64() {
-        return imageBase64;
-    }
-
-    public void setImageBase64(String imageBase64) {
-        this.imageBase64 = imageBase64;
+        try {
+            return new String(Files.readAllBytes(Paths.get(productId + ".txt")));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 
     public Product(String productId, Status status, String name, String brand, int price, int discountPercent, ArrayList<Seller> sellers, int numberAvailable, Category category, String description, LocalDateTime dateCreated, HashMap<String, String> features) {

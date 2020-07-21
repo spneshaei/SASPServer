@@ -9,6 +9,9 @@ import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -61,6 +64,8 @@ public class MainResource extends ServerResource {
                     return getAllSellers();
                 case "getAllAdministrators":
                     return getAllAdministrators();
+                case "getAllAssistants":
+                    return getAllAssistants();
                 case "getAllCategories":
                     return getAllCategories();
                 case "getAddProductBySellerRequests":
@@ -151,6 +156,8 @@ public class MainResource extends ServerResource {
                     return getKarmozd();
                 case "setKarmozd":
                     return setKarmozd();
+                case "setImageForProduct":
+                    return setImageForProduct();
                 default:
                     return new StringRepresentation("wrong-action");
             }
@@ -238,6 +245,7 @@ public class MainResource extends ServerResource {
 
     private Representation syncAssistants() {
         String json = getQuery().getValues("assistants");
+        System.out.println("syncAssistants: " + json);
         Assistant[] assistants = new Gson().fromJson(json, Assistant[].class);
         DataManager.shared().setAllAssistants(new ArrayList<>(Arrays.asList(assistants)));
         DataManager.saveData();
@@ -365,6 +373,7 @@ public class MainResource extends ServerResource {
         String firstName = getQuery().getValues("firstName");
         String lastName = getQuery().getValues("lastName");
         String type = getQuery().getValues("type");
+        String token = getQuery().getValues("token");
         String companyDetails = getQuery().getValues("companyDetails");
 
         String resultStr = "wrong-details";
@@ -388,9 +397,17 @@ public class MainResource extends ServerResource {
                 case "seller":
                     account = new Seller(username, password, email, phoneNumber, firstName, lastName, companyDetails, "");
                     break;
+                case "assistant":
+                    account = new Assistant(username, password, email, phoneNumber, firstName, lastName, "");
+                    break;
                 case "administrator":
-                    if (DataManager.shared().hasAnyAdminRegistered())
+                    if (DataManager.shared().hasAnyAdminRegistered()) {
+                        if (token != null && DataManager.shared().getAccountWithToken(token) instanceof Administrator) {
+                            account = new Administrator(username, password, email, phoneNumber, firstName, lastName, "");
+                            break;
+                        }
                         return new StringRepresentation("admin-registration-not-allowed");
+                    }
                     account = new Administrator(username, password, email, phoneNumber, firstName, lastName, "");
                     break;
             }
@@ -469,6 +486,10 @@ public class MainResource extends ServerResource {
 
     public Representation getAllAdministrators() {
         return new StringRepresentation(new Gson().toJson(DataManager.shared().getAllAdministrators()));
+    }
+
+    public Representation getAllAssistants() {
+        return new StringRepresentation(new Gson().toJson(DataManager.shared().getAllAssistants()));
     }
 
     public Representation getAllCategories() {
@@ -620,8 +641,8 @@ public class MainResource extends ServerResource {
         Iterator it = DataManager.shared().getLoggedInAccountsAndTokens().entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry) it.next();
-            Account account = (Account) pair.getValue();
-            if (!usernames.contains(account.getUsername())) usernames.add(account.getUsername());
+            String username = (String) pair.getValue();
+            if (!usernames.contains(username)) usernames.add(username);
             it.remove();
         }
         return new StringRepresentation(new Gson().toJson(usernames));
@@ -632,9 +653,10 @@ public class MainResource extends ServerResource {
         Iterator it = DataManager.shared().getLoggedInAccountsAndTokens().entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry) it.next();
-            Account account = (Account) pair.getValue();
-            if (account instanceof Assistant && !assistants.contains(account.getUsername()))
-                assistants.add(account.getUsername());
+            String username = (String) pair.getValue();
+            Account account = DataManager.shared().getAccountWithGivenUsername(username);
+            if (account instanceof Assistant && !assistants.contains(username))
+                assistants.add(username);
             it.remove();
         }
         return new StringRepresentation(new Gson().toJson(assistants));
@@ -682,6 +704,20 @@ public class MainResource extends ServerResource {
             return new StringRepresentation("success");
         } catch (NumberFormatException e) {
             e.printStackTrace();
+            return new StringRepresentation("wrong-action");
+        }
+    }
+
+    private Representation setImageForProduct() {
+        String productID = getQuery().getValues("productID");
+        String base64 = getQuery().getValues("base64");
+        if (productID == null || base64 == null || productID.length() > 50)
+            return new StringRepresentation("wrong-action");
+        try (PrintStream out = new PrintStream(new FileOutputStream(productID + ".txt"))) {
+            out.print(base64);
+            return new StringRepresentation("success");
+        } catch (IOException e) {
+            System.out.println("Unexpected exception happened in saving data: " + e.getLocalizedMessage());
             return new StringRepresentation("wrong-action");
         }
     }
