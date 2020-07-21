@@ -78,6 +78,8 @@ public class MainResource extends ServerResource {
                     return addRequest();
                 case "getAllCoupons":
                     return getAllCoupons();
+                case "getAuctions":
+                    return getAuctions();
                 case "getAllProducts":
                     return getAllProducts();
                 case "removeProduct":
@@ -106,12 +108,16 @@ public class MainResource extends ServerResource {
                     return syncProducts();
                 case "syncAuctions":
                     return syncAuctions();
+                case "syncAssistantMessages":
+                    return syncAssistantMessages();
                 case "syncCustomers":
                     return syncCustomers();
                 case "syncSellers":
                     return syncSellers();
                 case "syncAdministrators":
                     return syncAdministrators();
+                case "syncAssistants":
+                    return syncAssistants();
                 case "syncCategories":
                     return syncCategories();
                 case "syncSales":
@@ -130,12 +136,20 @@ public class MainResource extends ServerResource {
                     return getAdminBankAccountNumber();
                 case "getOnlineUsernames":
                     return getOnlineUsernames();
+                case "getOnlineAssistants":
+                    return getOnlineAssistants();
                 case "getMessagesForAuction":
                     return getMessagesForAuction();
+                case "getAssistantMessages":
+                    return getAssistantMessages();
                 case "getMinimumCredit":
                     return getMinimumCredit();
                 case "setMinimumCredit":
                     return setMinimumCredit();
+                case "getKarmozd":
+                    return getKarmozd();
+                case "setKarmozd":
+                    return setKarmozd();
                 default:
                     return new StringRepresentation("wrong-action");
             }
@@ -187,6 +201,14 @@ public class MainResource extends ServerResource {
         return new StringRepresentation("success");
     }
 
+    private Representation syncAssistantMessages() {
+        String messagesJSON = getQuery().getValues("messages");
+        AssistantMessage[] messages = new Gson().fromJson(messagesJSON, AssistantMessage[].class);
+        DataManager.shared().setAllAssistantMessages(new ArrayList<>(Arrays.asList(messages)));
+        DataManager.saveData();
+        return new StringRepresentation("success");
+    }
+
     private Representation syncCustomers() {
         String json = getQuery().getValues("customers");
         Customer[] customers = new Gson().fromJson(json, Customer[].class);
@@ -207,6 +229,14 @@ public class MainResource extends ServerResource {
         String json = getQuery().getValues("administrators");
         Administrator[] administrators = new Gson().fromJson(json, Administrator[].class);
         DataManager.shared().setAllAdministrators(new ArrayList<>(Arrays.asList(administrators)));
+        DataManager.saveData();
+        return new StringRepresentation("success");
+    }
+
+    private Representation syncAssistants() {
+        String json = getQuery().getValues("assistants");
+        Assistant[] assistants = new Gson().fromJson(json, Assistant[].class);
+        DataManager.shared().setAllAssistants(new ArrayList<>(Arrays.asList(assistants)));
         DataManager.saveData();
         return new StringRepresentation("success");
     }
@@ -476,6 +506,10 @@ public class MainResource extends ServerResource {
         return new StringRepresentation(new Gson().toJson(DataManager.shared().getAllCoupons()));
     }
 
+    public Representation getAuctions() {
+        return new StringRepresentation(new Gson().toJson(DataManager.shared().getAuctions()));
+    }
+
     public Representation getAllProducts() {
         return new StringRepresentation(new Gson().toJson(DataManager.shared().getAllProducts()));
     }
@@ -590,12 +624,29 @@ public class MainResource extends ServerResource {
         return new StringRepresentation(new Gson().toJson(usernames));
     }
 
+    private Representation getOnlineAssistants() {
+        ArrayList<String> assistants = new ArrayList<>();
+        Iterator it = DataManager.shared().getLoggedInAccountsAndTokens().entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            Account account = (Account) pair.getValue();
+            if (account instanceof Assistant && !assistants.contains(account.getUsername()))
+                assistants.add(account.getUsername());
+            it.remove();
+        }
+        return new StringRepresentation(new Gson().toJson(assistants));
+    }
+
     private Representation getMessagesForAuction() {
         String auctionID = getQuery().getValues("auctionID");
         if (auctionID == null || auctionID.length() > 32) return new StringRepresentation("wrong-action");
         Auction auction = DataManager.shared().getAuctionWithId(auctionID);
         if (auction == null) return new StringRepresentation("wrong-action");
         return new StringRepresentation(new Gson().toJson(auction.getMessages()));
+    }
+
+    private Representation getAssistantMessages() {
+        return new StringRepresentation(new Gson().toJson(DataManager.shared().getAllAssistantMessages()));
     }
 
     private Representation getMinimumCredit() {
@@ -607,6 +658,24 @@ public class MainResource extends ServerResource {
         if (creditStr == null || creditStr.length() > 100) return new StringRepresentation("wrong-action");
         try {
             DataManager.shared().setMimimumCredit(Integer.parseInt(creditStr));
+            return new StringRepresentation("success");
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return new StringRepresentation("wrong-action");
+        }
+    }
+
+    // TODO: Karmozd is not tested anywhere!
+
+    private Representation getKarmozd() {
+        return new StringRepresentation(String.valueOf(DataManager.shared().getKarmozd()));
+    }
+
+    private Representation setKarmozd() {
+        String karmozdStr = getQuery().getValues("karmozd");
+        if (karmozdStr == null || karmozdStr.length() > 100) return new StringRepresentation("wrong-action");
+        try {
+            DataManager.shared().setKarmozd(Integer.parseInt(karmozdStr));
             return new StringRepresentation("success");
         } catch (NumberFormatException e) {
             e.printStackTrace();

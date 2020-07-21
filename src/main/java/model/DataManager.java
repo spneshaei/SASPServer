@@ -26,6 +26,7 @@ public class DataManager {
     private ArrayList<Customer> allCustomers = new ArrayList<>();
     private ArrayList<Seller> allSellers = new ArrayList<>();
     private ArrayList<Administrator> allAdministrators = new ArrayList<>();
+    private ArrayList<Assistant> allAssistants = new ArrayList<>();
     private ArrayList<Product> allProducts = new ArrayList<>();
     private ArrayList<Coupon> allCoupons = new ArrayList<>();
     private ArrayList<AddProductBySellerRequest> addProductBySellerRequests = new ArrayList<>();
@@ -36,12 +37,30 @@ public class DataManager {
     private ArrayList<Ad> allAds = new ArrayList<>();
     private ArrayList<AddAdBySellerRequest> adRequests = new ArrayList<>();
     private ArrayList<Auction> auctions = new ArrayList<>();
+    private ArrayList<AssistantMessage> allAssistantMessages = new ArrayList<>();
     private String adminBankAccountNumber = "";
     private int mimimumCredit = 0;
+    private int karmozd = 0;
 
     private transient ArrayList<IPRecord> ipRecords = new ArrayList<>();
     private transient ArrayList<IPRecord> unsuccessfulLoginIPRecords = new ArrayList<>();
     public static transient ArrayList<String> commonPasswords = new ArrayList<>();
+
+    public ArrayList<AssistantMessage> getAllAssistantMessages() {
+        return allAssistantMessages;
+    }
+
+    public void setAllAssistantMessages(ArrayList<AssistantMessage> allAssistantMessages) {
+        this.allAssistantMessages = allAssistantMessages;
+    }
+
+    public ArrayList<Assistant> getAllAssistants() {
+        return allAssistants;
+    }
+
+    public void setAllAssistants(ArrayList<Assistant> allAssistants) {
+        this.allAssistants = allAssistants;
+    }
 
     public int getMimimumCredit() {
         return mimimumCredit;
@@ -49,6 +68,15 @@ public class DataManager {
 
     public void setMimimumCredit(int mimimumCredit) {
         this.mimimumCredit = mimimumCredit;
+        DataManager.saveData();
+    }
+
+    public int getKarmozd() {
+        return mimimumCredit;
+    }
+
+    public void setKarmozd(int karmozd) {
+        this.karmozd = karmozd;
         DataManager.saveData();
     }
 
@@ -270,6 +298,7 @@ public class DataManager {
         result.addAll(allCustomers);
         result.addAll(allSellers);
         result.addAll(allAdministrators);
+        result.addAll(allAssistants);
         return result;
     }
 
@@ -417,6 +446,8 @@ public class DataManager {
             allSellers.add((Seller) account);
         } else if (account instanceof Administrator) {
             allAdministrators.add((Administrator) account);
+        } else if (account instanceof Assistant) {
+            allAssistants.add((Assistant) account);
         }
         saveData();
     }
@@ -494,6 +525,8 @@ public class DataManager {
                 .findFirst().ifPresent(account -> allSellers.remove(account));
         allAdministrators.stream().filter(account -> account.getUsername().equals(username))
                 .findFirst().ifPresent(account -> allAdministrators.remove(account));
+        allAssistants.stream().filter(account -> account.getUsername().equals(username))
+                .findFirst().ifPresent(account -> allAssistants.remove(account));
         saveData();
     }
 
