@@ -23,17 +23,10 @@ import java.util.stream.Collectors;
 public class MainResource extends ServerResource {
     @Get
     public Representation getAction() {
-        DataManager.loadData();
-        if (!DataManager.shared().isMadeAdminBankAccount()) {
-            BankAPI.tellBankAndReceiveResponse("create_account Admin Admin admin kBfo#ou@yeq2 kBfo#ou@yeq2", response -> {
-                DataManager.shared().setAdminBankAccountNumber(response);
-                DataManager.saveData();
-            });
-        }
         IPRecord ipRecord = new IPRecord(getIP(), LocalDateTime.now());
         DataManager.shared().addIPRecord(ipRecord);
-//        if (DataManager.shared().hasMoreThanAThousandIPRecordsInASecond(ipRecord))
-//            return new StringRepresentation("too-many-times");
+        if (DataManager.shared().hasMoreThanAThousandIPRecordsInASecond(ipRecord))
+            return new StringRepresentation("too-many-times");
         String action = getQuery().getValues("action");
         if (action == null) return new StringRepresentation("wrong-action");
         try {
@@ -342,8 +335,8 @@ public class MainResource extends ServerResource {
 
     private Representation login() {
         IPRecord ipRecord = new IPRecord(getIP(), LocalDateTime.now());
-//        if (DataManager.shared().hasMoreThanTenUnsuccessfulLoginIPRecordsIn100Seconds(ipRecord))
-//            return new StringRepresentation("too-many-times");
+        if (DataManager.shared().hasMoreThanTenUnsuccessfulLoginIPRecordsIn100Seconds(ipRecord))
+            return new StringRepresentation("too-many-times");
         String username = getQuery().getValues("username");
         String password = getQuery().getValues("password");
         String resultStr = "wrong-details";
@@ -384,7 +377,8 @@ public class MainResource extends ServerResource {
                 || phoneNumber.equals("") || firstName.equals("") || lastName.equals("") || type.equals("")
                 || (type.equals("seller") && (companyDetails == null || companyDetails.equals(""))) ||
                 username.length() > 100 || password.length() > 100 || email.length() > 100 ||
-                phoneNumber.length() > 50 || firstName.length() > 150 || lastName.length() > 150 || type.length() > 25)
+                phoneNumber.length() > 50 || firstName.length() > 150 || lastName.length() > 150 || type.length() > 25 ||
+                !Validator.shared().emailIsValid(email) || !Validator.shared().phoneNumberIsValid(phoneNumber))
             return new StringRepresentation(resultStr);
         if (!isPasswordStrong(password)) return new StringRepresentation("weak-password");
         if (!DataManager.shared().doesUserWithGivenUsernameExist(username)) {
@@ -417,7 +411,10 @@ public class MainResource extends ServerResource {
                 Account finalAccount = account;
                 BankAPI.tellBankAndReceiveResponse("create_account " + firstName + " " +
                         lastName + " " + username + " " + password + " " + password, response -> {
-                    if (finalAccount != null) finalAccount.setBankAccountNumber(response);
+                    if (finalAccount != null) {
+                        finalAccount.setBankAccountNumber(response);
+                        DataManager.saveData();
+                    }
                 });
             }
             resultStr = "success";
@@ -682,10 +679,12 @@ public class MainResource extends ServerResource {
         String creditStr = getQuery().getValues("credit");
         if (creditStr == null || creditStr.length() > 100) return new StringRepresentation("wrong-action");
         try {
+            int credit = Integer.parseInt(creditStr);
+            if (credit < 0) return new StringRepresentation("wrong-action");
             DataManager.shared().setMimimumCredit(Integer.parseInt(creditStr));
             return new StringRepresentation("success");
         } catch (NumberFormatException e) {
-            e.printStackTrace();
+            System.out.println("Wrong number format for " + creditStr);
             return new StringRepresentation("wrong-action");
         }
     }
@@ -700,6 +699,8 @@ public class MainResource extends ServerResource {
         String karmozdStr = getQuery().getValues("karmozd");
         if (karmozdStr == null || karmozdStr.length() > 100) return new StringRepresentation("wrong-action");
         try {
+            int karmozd = Integer.parseInt(karmozdStr);
+            if (karmozd < 0 || karmozd >= 100) return new StringRepresentation("wrong-action");
             DataManager.shared().setKarmozd(Integer.parseInt(karmozdStr));
             return new StringRepresentation("success");
         } catch (NumberFormatException e) {

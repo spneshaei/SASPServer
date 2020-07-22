@@ -20,9 +20,11 @@ public class BankAPI {
             new Thread(() -> {
                 try {
                     outputStream.writeUTF(message);
+                    System.out.println("Wrote Message to Bank: " + message);
                     while (true) {
                         String response = inputStream.readUTF();
                         if (response.equals("")) continue;
+                        System.out.println("Received response from Bank: " + response);
                         listener.responseReceived(response);
                         break;
                     }

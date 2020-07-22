@@ -7,16 +7,29 @@ import org.restlet.data.Protocol;
 import java.util.Scanner;
 
 public class ServerMain extends Application {
-    public static void main(String...args) throws Exception {
-        System.out.print("Enter 1 to initialize DB and 2 to start the server: ");
+    public static void main(String... args) throws Exception {
+        System.out.print("Enter 1 to initialize DB and then start the server, or 2 to start the server: ");
         Scanner scanner = new Scanner(System.in);
         int input = scanner.nextInt();
-        if (input == 1) {
-            DBHandler.initializeProductTable();
-        } else {
-            Server server = new Server(Protocol.HTTP, 8111,
-                    MainResource.class);
-            server.start();
+        DataManager.loadData();
+        if (input == 1) DBHandler.initializeTables();
+        else DataManager.loadFromDB();
+        if (!DataManager.shared().isMadeAdminBankAccount()) {
+            BankAPI.tellBankAndReceiveResponse("create_account Admin Admin admin kBfo#ou@yeq2 kBfo#ou@yeq2", response -> {
+                DataManager.shared().setAdminBankAccountNumber(response);
+                DataManager.saveData();
+            });
+        }
+        Server server = new Server(Protocol.HTTP, 8112,
+                MainResource.class);
+        server.start();
+        while (true) {
+            int input2 = scanner.nextInt();
+            if (input2 == 0) {
+                DataManager.saveData();
+                DataManager.saveToDB();
+                System.exit(0);
+            }
         }
 
 

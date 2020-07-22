@@ -9,6 +9,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import server.DBHandler;
 
 import java.io.*;
 import java.lang.reflect.Type;
@@ -83,22 +84,19 @@ public class DataManager {
     // TODO: Does the next method work correctly??
 
     public boolean hasMoreThanAThousandIPRecordsInASecond(IPRecord currentIPRecord) {
-        synchronized (ipRecords) {
-//            ArrayList<IPRecord> ipRecords = this.ipRecords;
-            long count = 0L;
-            for (Iterator<IPRecord> iterator = ipRecords.iterator(); iterator.hasNext(); ) {
-                IPRecord ipRecord = iterator.next();
-                if (ipRecord.getIp().equals(currentIPRecord.getIp()) &&
-                        Math.abs(ChronoUnit.SECONDS.between(ipRecord.getDate(), currentIPRecord.getDate())) < 2) {
-                    count += 1;
-                }
+        long count = 0L;
+        ArrayList<IPRecord> records = new ArrayList<>(ipRecords);
+        for (IPRecord ipRecord : records) {
+            if (ipRecord.getIp().equals(currentIPRecord.getIp()) &&
+                    Math.abs(ChronoUnit.SECONDS.between(ipRecord.getDate(), currentIPRecord.getDate())) < 2) {
+                count += 1;
             }
-            return (int) count > 1000;
         }
+        return (int) count > 1000;
     }
 
     public boolean hasMoreThanTenUnsuccessfulLoginIPRecordsIn100Seconds(IPRecord currentIPRecord) {
-        ArrayList<IPRecord> unsuccessfulLoginIPRecords = this.unsuccessfulLoginIPRecords;
+        ArrayList<IPRecord> unsuccessfulLoginIPRecords = new ArrayList<>(this.unsuccessfulLoginIPRecords);
         return (int) unsuccessfulLoginIPRecords.stream().filter(ipRecord -> ipRecord.getIp().equals(currentIPRecord.getIp()) &&
                 Math.abs(ChronoUnit.SECONDS.between(ipRecord.getDate(), currentIPRecord.getDate())) < 100).count() > 10;
     }
@@ -210,10 +208,12 @@ public class DataManager {
         } catch (IOException e) {
             System.out.println("Unexpected exception happened in saving data: " + e.getLocalizedMessage());
         }
+    }
 
-//        DBHandler.insertProductsIntoTable();
-//        DBHandler.insertPurchaseLogsIntoTable();
-//        DBHandler.insertUsersIntoTable();
+    public static void saveToDB() {
+        DBHandler.insertProductsIntoTable();
+        DBHandler.insertPurchaseLogsIntoTable();
+        DBHandler.insertUsersIntoTable();
     }
 
     // TODO: Not tested + what will happen in the client if we pass a common password??
@@ -241,10 +241,12 @@ public class DataManager {
             System.out.println("Unexpected exception happened in loading data: " + e.getLocalizedMessage());
 //            e.printStackTrace();
         }
+    }
 
-//        DBHandler.selectProductsFromTable();
-//        DBHandler.selectUsersFromTable();
-//        DBHandler.selectPurchaseLogsFromTable();
+    public static void loadFromDB() {
+        DBHandler.selectProductsFromTable();
+        DBHandler.selectUsersFromTable();
+        DBHandler.selectPurchaseLogsFromTable();
     }
 
     public ArrayList<Ad> getAllAds() {

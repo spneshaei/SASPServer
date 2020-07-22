@@ -9,9 +9,9 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class DBHandler {
-    public static void initializeProductTable() {
-        Connection c = null;
-        Statement stmt = null;
+    public static void initializeTables() {
+        Connection c;
+        Statement stmt;
         try {
             Class.forName("org.sqlite.JDBC");
             c = DriverManager.getConnection("jdbc:sqlite:SqliteJavaDB.db");
@@ -145,7 +145,7 @@ public class DBHandler {
                 ps.setString(18, product.isSelected() ? "true" : "false");
                 // TODO: Important: Does the next line work??
                 ps.setString(19, gson.toJson(product.getFeatures()));
-                ps.executeQuery();
+                ps.executeUpdate();
                 c.commit();
                 stmt.close();
                 c.close();
@@ -213,7 +213,7 @@ public class DBHandler {
                 ps.setString(13, account.getBankAccountNumber());
                 ps.setString(14, (account instanceof Seller) ? (((Seller) account).isPermittedToSell() ? "true" : "false") : null);
                 ps.setString(15, (account instanceof Seller) ? ((Seller) account).getCompanyDetails() : null);
-                ps.executeQuery();
+                ps.executeUpdate();
                 c.commit();
                 stmt.close();
                 c.close();
@@ -255,7 +255,7 @@ public class DBHandler {
                 ps.setString(5, log.getProducts().toString());
                 ps.setString(6, log.getCustomer().getUsername());
                 ps.setString(7, log.getDeliveryStatus().toString());
-                ps.executeQuery();
+                ps.executeUpdate();
                 c.commit();
                 stmt.close();
                 c.close();
