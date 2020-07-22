@@ -13,6 +13,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,6 +30,11 @@ public class MainResource extends ServerResource {
             return new StringRepresentation("too-many-times");
         String action = getQuery().getValues("action");
         if (action == null) return new StringRepresentation("wrong-action");
+        String timeString = getQuery().getValues("time");
+        if (timeString == null) return new StringRepresentation("wrong-time");
+        LocalDateTime sentDate = DataManager.dateFromString(timeString);
+        if (Math.abs(ChronoUnit.MINUTES.between(LocalDateTime.now(), sentDate)) >= 30)
+            return new StringRepresentation("too-long-time");
         try {
             switch (action) {
                 case "register":
