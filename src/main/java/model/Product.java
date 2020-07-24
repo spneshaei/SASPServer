@@ -30,6 +30,12 @@ public class Product {
     private String currentSeller = "";
     private boolean isSelected = false;
     private HashMap<String, String> features;
+    private String fileName;
+    private String fileContents;
+
+    public String getFileContents() {
+        return fileContents;
+    }
 
     public void setName(String name) {
         this.name = name;

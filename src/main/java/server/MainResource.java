@@ -10,9 +10,8 @@ import org.restlet.resource.ServerResource;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.crypto.Data;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -205,6 +204,18 @@ public class MainResource extends ServerResource {
         String productsJSON = getQuery().getValues("products");
         Product[] products = new Gson().fromJson(productsJSON, Product[].class);
         DataManager.shared().setAllProducts(new ArrayList<>(Arrays.asList(products)));
+        for (Product product : DataManager.shared().getAllProducts()) {
+            if (product.getFileContents() != null) {
+                PrintWriter writer;
+                try {
+                    writer = new PrintWriter(product.getName() + ".txt", StandardCharsets.UTF_8);
+                    writer.println(product.getFileContents());
+                    writer.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
         DataManager.saveData();
         return new StringRepresentation("success");
     }
