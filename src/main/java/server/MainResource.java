@@ -208,7 +208,7 @@ public class MainResource extends ServerResource {
             if (product.getFileContents() != null) {
                 PrintWriter writer;
                 try {
-                    writer = new PrintWriter(product.getName() + ".txt", StandardCharsets.UTF_8);
+                    writer = new PrintWriter(product.getName() + ".txt");
                     writer.println(product.getFileContents());
                     writer.close();
                 } catch (IOException e) {
