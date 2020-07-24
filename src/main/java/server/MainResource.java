@@ -9,6 +9,7 @@ import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.crypto.Data;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -760,7 +761,8 @@ public class MainResource extends ServerResource {
         String password = getQuery().getValues("password");
         String credit = getQuery().getValues("credit");
         String accountBankAccountNumber = getQuery().getValues("accountBankAccountNumber");
-
+        Account account = DataManager.shared().getAccountWithGivenUsername(username);
+        account.setCredit(account.getCredit() + Integer.parseInt(credit));
         BankAPI.tellBankAndReceiveResponse("get_token " + username + " " + password, token -> {
             BankAPI.tellBankAndReceiveResponse("create_receipt " + token + " " +
                     "withdraw" + " " + credit + " " +
@@ -778,7 +780,8 @@ public class MainResource extends ServerResource {
         String password = getQuery().getValues("password");
         String credit = getQuery().getValues("credit");
         String accountBankAccountNumber = getQuery().getValues("accountBankAccountNumber");
-
+        Account account = DataManager.shared().getAccountWithGivenUsername(username);
+        account.setCredit(account.getCredit() - Integer.parseInt(credit));
         BankAPI.tellBankAndReceiveResponse("get_token " + username + " " + password, token -> {
             BankAPI.tellBankAndReceiveResponse("create_receipt " + token + " " +
                     "deposit" + " " + credit + " " +
