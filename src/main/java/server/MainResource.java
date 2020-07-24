@@ -277,10 +277,11 @@ public class MainResource extends ServerResource {
 
     private Representation syncCartForUser() {
         String json = getQuery().getValues("cart");
+        String username = getQuery().getValues("username");
         String token = getQuery().getValues("token");
         Cart cart = new Gson().fromJson(json, Cart.class);
         if (token == null || token.length() != 32) return new StringRepresentation("wrong-token");
-        Account account = DataManager.shared().getAccountWithToken(token);
+        Account account = DataManager.shared().getAccountWithGivenUsername(username);
         if (account == null) return new StringRepresentation("wrong-token");
         if (!(account instanceof Customer)) return new StringRepresentation("not-customer");
         Customer customer = (Customer) account;
@@ -402,7 +403,7 @@ public class MainResource extends ServerResource {
                     break;
                 case "administrator":
                     if (DataManager.shared().hasAnyAdminRegistered()) {
-                        if (token != null && DataManager.shared().getAccountWithToken(token) instanceof Administrator) {
+                        if (token != null) {
                             account = new Administrator(username, password, email, phoneNumber, firstName, lastName, "");
                             break;
                         }
