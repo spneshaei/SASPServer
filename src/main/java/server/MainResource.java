@@ -748,7 +748,7 @@ public class MainResource extends ServerResource {
 
         BankAPI.tellBankAndReceiveResponse("get_token " + username + " " + password, token ->
                 BankAPI.tellBankAndReceiveResponse("create_receipt " + token + " " +
-                        "move" + " " + priceAfterDiscount + " " + customerBankAccountNumber +
+                        "move" + " " + (int) Double.parseDouble(priceAfterDiscount) + " " + customerBankAccountNumber +
                         " " + adminBankAccountNumber + " pBBT", receiptID ->
                         BankAPI.tellBankAndReceiveResponse("pay " + receiptID, response -> {
 
@@ -766,7 +766,7 @@ public class MainResource extends ServerResource {
         account.setCredit(account.getCredit() + Integer.parseInt(credit));
         BankAPI.tellBankAndReceiveResponse("get_token " + username + " " + password, token -> {
             BankAPI.tellBankAndReceiveResponse("create_receipt " + token + " " +
-                    "move" + " " + credit + " " +
+                    "move" + " " + (int) Double.parseDouble(credit) + " " +
                     adminBankAccountNumber + " " + accountBankAccountNumber + " move", receiptID ->
                     BankAPI.tellBankAndReceiveResponse("pay " + receiptID, response -> {
 
@@ -785,7 +785,7 @@ public class MainResource extends ServerResource {
         account.setCredit(account.getCredit() - Integer.parseInt(credit));
         BankAPI.tellBankAndReceiveResponse("get_token " + username + " " + password, token -> {
             BankAPI.tellBankAndReceiveResponse("create_receipt " + token + " " +
-                    "deposit" + " " + credit + " " +
+                    "deposit" + " " + (int) Double.parseDouble(credit) + " " +
                     "-1" + " " + accountBankAccountNumber + " deposit", receiptID ->
                     BankAPI.tellBankAndReceiveResponse("pay " + receiptID, response ->
                     {
@@ -802,7 +802,7 @@ public class MainResource extends ServerResource {
 
         BankAPI.tellBankAndReceiveResponse("get_token " + username + " " + password, token -> {
             BankAPI.tellBankAndReceiveResponse("create_receipt " + token + " " +
-                    "deposit" + " " + credit + " " +
+                    "deposit" + " " + (int) Double.parseDouble(credit) + " " +
                     "-1" + " " + accountBankAccountNumber + " deposit", receiptID ->
                     BankAPI.tellBankAndReceiveResponse("pay " + receiptID, response ->
                     {
