@@ -20,7 +20,7 @@ public class ServerMain extends Application {
                 DataManager.saveData();
             });
         }
-        Server server = new Server(Protocol.HTTP, 8112,
+        Server server = new Server(Protocol.HTTP, 1234,
                 MainResource.class);
         server.start();
         while (true) {
