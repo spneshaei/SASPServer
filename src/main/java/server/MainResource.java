@@ -761,12 +761,13 @@ public class MainResource extends ServerResource {
         String password = getQuery().getValues("password");
         String credit = getQuery().getValues("credit");
         String accountBankAccountNumber = getQuery().getValues("accountBankAccountNumber");
+        String adminBankAccountNumber = getQuery().getValues("adminBankAccountNumber");
         Account account = DataManager.shared().getAccountWithGivenUsername(username);
         account.setCredit(account.getCredit() + Integer.parseInt(credit));
         BankAPI.tellBankAndReceiveResponse("get_token " + username + " " + password, token -> {
             BankAPI.tellBankAndReceiveResponse("create_receipt " + token + " " +
-                    "withdraw" + " " + credit + " " +
-                    accountBankAccountNumber + " " + "-1" + " withdraw", receiptID ->
+                    "move" + " " + credit + " " +
+                    adminBankAccountNumber + " " + accountBankAccountNumber + " move", receiptID ->
                     BankAPI.tellBankAndReceiveResponse("pay " + receiptID, response -> {
 
                             }
