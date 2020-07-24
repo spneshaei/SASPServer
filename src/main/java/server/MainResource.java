@@ -157,6 +157,14 @@ public class MainResource extends ServerResource {
                     return setKarmozd();
                 case "setImageForProduct":
                     return setImageForProduct();
+                case "payByBank":
+                    return payByBank();
+                case "addCreditTapped":
+                    return addCreditTapped();
+                case "removeCreditTapped":
+                    return removeCreditTapped();
+                case "chargeBankAccount":
+                    return chargeBankAccount();
                 default:
                     return new StringRepresentation("wrong-action");
             }
@@ -728,6 +736,75 @@ public class MainResource extends ServerResource {
             System.out.println("Unexpected exception happened in saving data: " + e.getLocalizedMessage());
             return new StringRepresentation("wrong-action");
         }
+    }
+
+    private Representation payByBank() {
+        String username = getQuery().getValues("username");
+        String password = getQuery().getValues("password");
+        String customerBankAccountNumber = getQuery().getValues("customerBankAccountNumber");
+        String adminBankAccountNumber = getQuery().getValues("adminBankAccountNumber");
+        String priceAfterDiscount = getQuery().getValues("priceAfterDiscount");
+
+        BankAPI.tellBankAndReceiveResponse("get_token " + username + " " + password, token ->
+                BankAPI.tellBankAndReceiveResponse("create_receipt " + token + " " +
+                        "move" + " " + priceAfterDiscount + " " + customerBankAccountNumber +
+                        " " + adminBankAccountNumber + " pBBT", receiptID ->
+                        BankAPI.tellBankAndReceiveResponse("pay " + receiptID, response -> {
+
+                        })));
+        return new StringRepresentation("success");
+    }
+
+    private Representation addCreditTapped() {
+        String username = getQuery().getValues("username");
+        String password = getQuery().getValues("password");
+        String credit = getQuery().getValues("credit");
+        String accountBankAccountNumber = getQuery().getValues("accountBankAccountNumber");
+
+        BankAPI.tellBankAndReceiveResponse("get_token " + username + " " + password, token -> {
+            BankAPI.tellBankAndReceiveResponse("create_receipt " + token + " " +
+                    "withdraw" + " " + credit + " " +
+                    accountBankAccountNumber + " " + "-1" + " withdraw", receiptID ->
+                    BankAPI.tellBankAndReceiveResponse("pay " + receiptID, response -> {
+
+                            }
+                    ));
+        });
+        return new StringRepresentation("success");
+    }
+
+    private Representation removeCreditTapped() {
+        String username = getQuery().getValues("username");
+        String password = getQuery().getValues("password");
+        String credit = getQuery().getValues("credit");
+        String accountBankAccountNumber = getQuery().getValues("accountBankAccountNumber");
+
+        BankAPI.tellBankAndReceiveResponse("get_token " + username + " " + password, token -> {
+            BankAPI.tellBankAndReceiveResponse("create_receipt " + token + " " +
+                    "deposit" + " " + credit + " " +
+                    "-1" + " " + accountBankAccountNumber + " deposit", receiptID ->
+                    BankAPI.tellBankAndReceiveResponse("pay " + receiptID, response ->
+                    {
+                    }));
+        });
+        return new StringRepresentation("success");
+    }
+
+    private Representation chargeBankAccount() {
+        String username = getQuery().getValues("username");
+        String password = getQuery().getValues("password");
+        String credit = getQuery().getValues("credit");
+        String accountBankAccountNumber = getQuery().getValues("accountBankAccountNumber");
+
+        BankAPI.tellBankAndReceiveResponse("get_token " + username + " " + password, token -> {
+            BankAPI.tellBankAndReceiveResponse("create_receipt " + token + " " +
+                    "deposit" + " " + credit + " " +
+                    "-1" + " " + accountBankAccountNumber + " deposit", receiptID ->
+                    BankAPI.tellBankAndReceiveResponse("pay " + receiptID, response ->
+                    {
+                    }));
+        });
+        return new StringRepresentation("success");
     }
 
     // TODO: Better password strength alg... both in server and client!
